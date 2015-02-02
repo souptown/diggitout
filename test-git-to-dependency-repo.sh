@@ -2,7 +2,7 @@
 
 TEST_WORKSPACE=test-workspace
 SOURCE_REPO=test-repo
-FILE_TO_EXTRACT="binary.bin text.txt"
+FILE_TO_EXTRACT="binary.bin binary2.bin" # text.txt"
 EXTRACTED_FILES_FOLDER=extracted
 
 # remove and re-create the test working dir

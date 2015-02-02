@@ -49,7 +49,7 @@ function extractFile() {
 		local FILENAME_SANS_EXTENSION="${BASENAME%.*}"
 		local VERSIONED_FILE_NAME="$FILENAME_SANS_EXTENSION-$COMMIT_NUMBER.$EXTENSION"
 		# Check out the commit and copy the file to the target folder with versioned name
-		echo "        Copying $BASENAME as $VERSIONED_FILE_NAME from $COMMIT"
+		echo "        Copying $BASENAME as $VERSIONED_FILE_NAME from $COMMIT with md5="$(md5sum -b $FILE | cut -d ' ' -f1)
 		git checkout -q $COMMIT
 		cp $FILE $TARGET_FOLDER/$VERSIONED_FILE_NAME
 		COMMIT_NUMBER=`expr $COMMIT_NUMBER - 1`
@@ -96,17 +96,34 @@ done
 
 cd "$SOURCE_REPO"
 
-echo "#!/bin/bash" >> ../rmfiles.sh
-for FILE in "${SOURCE_FILES[@]}"
-do
-	git checkout master
-	extractFile $FILE
-	echo "git rm --cached --ignore-unmatch \"$FILE\"" >> ../rmfiles.sh
-done
+# echo "#!/bin/bash" >> ../rmfiles.sh
+# for FILE in "${SOURCE_FILES[@]}"
+# do
+# 	git checkout master
+# 	extractFile $FILE
 
-cat ../rmfiles.sh
+# 	#echo "if [ -f \"../../$FILE\" ]; then echo \"$FILE\" exists.; else echo \"$FILE\" does not exist.; fi" >> ../rmfiles.sh
+# 	#echo "pwd & tree ../.." >> ../rmfiles.sh
+# #	echo "md5sum -b ../../\"$FILE\" | cut -d ' ' -f1" >> ../rmfiles.sh
+# #	echo "printf \"\\n$FILE\"" >> ../rmfiles.sh
 
-git checkout master
+# 	echo "printf \"\\nLook for $FILE\\n\"" >> ../rmfiles.sh	
+# #	echo "printf \"ls\"" >> ../rmfiles.sh
+# 	#echo "git ls-files --full-name \"$FILE\"" >> ../rmfiles.sh
+# #	echo "git rm --cached --ignore-unmatch \"$FILE\"" >> ../rmfiles.sh
+# done
 
-RMFILES=$(realpath "../rmfiles.sh")
-git filter-branch --index-filter "$RMFILES" HEAD
+# chmod +x ../rmfiles.sh
+# echo "*****"
+# cat ../rmfiles.sh
+# echo "*****"
+
+pwd
+git checkout -q master
+
+#RMFILES=$(realpath "../rmfiles.sh")
+#CMD="/repositories/diggitout/extract-and-record-files.sh \"/repositories/diggitout/test-workspace/extracted\" \"/repositories/diggitout/test-workspace/test-repo/binary.bin\" \"/repositories/diggitout/test-workspace/test-repo/binary2.bin\""
+CMD="/repositories/diggitout/extract-and-record-files.sh \"/repositories/diggitout/test-workspace/extracted\" \"binary.bin\" \"binary2.bin\""
+#git filter-branch --index-filter "$CMD" -- --all
+git filter-branch -f --tree-filter "$CMD" -- --all
+
