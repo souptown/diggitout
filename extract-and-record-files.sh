@@ -34,18 +34,13 @@ function getFileHash {
 
 function extractFile() {
 	local FILE=$1
-	if [[ -f "$FILE" ]]; then
-		echo "$FILE is still a file" >&2
-	else
-		echo "$FILE is no longer a file" >&2
-	fi
 	local BASENAME=$(basename "$FILE")
 	local EXTENSION="${BASENAME##*.}"
 	local FILENAME_SANS_EXTENSION="${BASENAME%.*}"
 	local CHECKSUM=$(getFileHash $FILE)
 	# source the manifest file so we can look up checksums for existing files
 	. "$manifest"
-	local OTHER_VERSIONS_COUNT=$(ls -l -Q $targetFolder/$FILENAME_SANS_EXTENSION-*.$EXTENSION | wc -l)
+	local OTHER_VERSIONS_COUNT=$(ls -l -Q $targetFolder/$FILENAME_SANS_EXTENSION-*.$EXTENSION 2>/dev/null | wc -l)
 	local found=no
 	for i in $(seq 1 $OTHER_VERSIONS_COUNT)
 	do
@@ -78,11 +73,10 @@ echo ""
 for parameter in "$@"
 do
 	if [[ -f "$parameter" ]]; then
-		echo "$parameter is a file"
 		extractFile $parameter
 	elif [[ -d "$parameter" ]]; then
 		echo "$parameter is a folder"
-	else
-    	echo "$parameter is an invalid path"
+	# else
+ #    	echo "$parameter is an invalid path"
     fi
 done
