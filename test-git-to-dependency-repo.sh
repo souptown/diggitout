@@ -2,7 +2,7 @@
 
 TEST_WORKSPACE=test-workspace
 SOURCE_REPO=test-repo
-FILE_TO_EXTRACT="binary.bin binary2.bin" # text.txt"
+FILES_TO_EXTRACT="files-to-remove.txt" # text.txt"
 EXTRACTED_FILES_FOLDER=extracted
 
 # remove and re-create the test working dir
@@ -21,8 +21,7 @@ mkdir "$TEST_WORKSPACE/$EXTRACTED_FILES_FOLDER"
 # extract the test repo into the working dir
 unzip -q test-repo -d $TEST_WORKSPACE
 
-cd $TEST_WORKSPACE
 echo ""
-eval "../git-to-dependency-repo.sh -r \"$SOURCE_REPO\" -o m -d \"$EXTRACTED_FILES_FOLDER\" $FILE_TO_EXTRACT"
+./git-to-dependency-repo.sh -r "$TEST_WORKSPACE/$SOURCE_REPO" -o m -d "$TEST_WORKSPACE/$EXTRACTED_FILES_FOLDER" -f "$FILES_TO_EXTRACT"
 
 

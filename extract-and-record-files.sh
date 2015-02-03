@@ -9,9 +9,14 @@
 # hash will be written to a properties file.
 
 targetFolder=$1
+pathsFile=$2
+repoFolder=$3
 manifest="$targetFolder/manifest.sh"
 restoreFile=restore-extracted-files.sh
-shift
+
+# echo "targetFolder=$targetFolder"
+# echo "pathsFile=$pathsFile"
+# echo "manifest=$manifest"
 
 # make sure the target folder exists
 if [ ! -d $targetFolder ]; then
@@ -40,9 +45,9 @@ function extractFile() {
 	local CHECKSUM=$(getFileHash $FILE)
 	# source the manifest file so we can look up checksums for existing files
 	. "$manifest"
-	local OTHER_VERSIONS_COUNT=$(ls -l -Q $targetFolder/$FILENAME_SANS_EXTENSION-*.$EXTENSION 2>/dev/null | wc -l)
+	local OTHER_VERSIONS_COUNT=$(ls -Q $targetFolder/$FILENAME_SANS_EXTENSION-*.$EXTENSION 2>/dev/null | wc -l | cut -d ' ' -f7)
 	local found=no
-	for i in $(seq 1 $OTHER_VERSIONS_COUNT)
+	for ((i=1; i<=OTHER_VERSIONS_COUNT; i++))
 	do
 		local temp="$FILENAME_SANS_EXTENSION-$i.$EXTENSION"
 		temp=${temp// /_}
@@ -69,13 +74,18 @@ function extractFile() {
 }
 
 echo ""
-echo ""
-for parameter in "$@"
+cd ../..
+for line in $(cat "$pathsFile")
 do
-	if [[ -f "$parameter" ]]; then
-		extractFile $parameter
-	elif [[ -d "$parameter" ]]; then
-		echo "$parameter is a folder"
+	if [[ -f "$line" ]]; then
+		extractFile $line
+	elif [[ -d "$line" ]]; then
+		echo "$repoFolder/$line is a folder"
+		for f in $(ls $repoFolder/$line)
+		do
+			echo $f
+			extractFile $f
+		done
 	# else
  #    	echo "$parameter is an invalid path"
     fi

@@ -5,7 +5,7 @@ OPTIND=1         # Reset in case getopts has been used previously in the shell.
 
 # Initialize our own variables:
 SOURCE_REPO=""
-SOURCE_FILES=""
+PATHS_FILE=""
 DEPENDENCY_REPO_TYPE=""
 TARGET_FOLDER=""
 VERBOSE=0
@@ -25,9 +25,8 @@ function show_help() {
 	echo "    -r  Path to a local git repository"
 	echo "    -o  Type of output or dependency repository. Valid values are 'm' for Maven and 'n' for NuGet"
 	echo "    -d  Directory in which to place the versioned files"
+	echo "    -f  File containing paths of files to remove. 1 path per line."
 }
-
-function realpathfoo { echo $(cd $(dirname $1); pwd)/$(basename $1); }
 
 function realpath() {
 	(
@@ -56,30 +55,30 @@ while getopts "h?vr:f:o:d:" opt; do
     d)
 		TARGET_FOLDER=$(realpath "$OPTARG")
 		;;
+    f)
+		PATHS_FILE=$(realpath "$OPTARG")
+		;;
     esac
 done
 
 shift $((OPTIND-1))
 # $@ now has file names
-SOURCE_FILES=( "$@" )
 
 echo "Repository:"
 echo "    "$(realpath "$SOURCE_REPO")
 echo "Target folder for extracted files:"
 echo "    "$TARGET_FOLDER
 echo "Files to extract:"
-for FILE in "${SOURCE_FILES[@]}"
+for fff in $(cat "$PATHS_FILE")
 do
-   echo "    $FILE"
+	echo "    $fff"
 done
+echo ""
 
 cd "$SOURCE_REPO"
 git checkout -q master
 rm -rf /repositories/diggitout/test-workspace/extracted
 
-#RMFILES=$(realpath "../rmfiles.sh")
-#CMD="/repositories/diggitout/extract-and-record-files.sh \"/repositories/diggitout/test-workspace/extracted\" \"/repositories/diggitout/test-workspace/test-repo/binary.bin\" \"/repositories/diggitout/test-workspace/test-repo/binary2.bin\""
-CMD="/repositories/diggitout/extract-and-record-files.sh \"/repositories/diggitout/test-workspace/extracted\" \"binary.bin\" \"binary2.bin\""
-#git filter-branch --index-filter "$CMD" -- --all
+CMD="$STARTING_FOLDER/extract-and-record-files.sh '$TARGET_FOLDER' '$PATHS_FILE' '$SOURCE_REPO'"
 git filter-branch -f --tree-filter "$CMD" -- --all
 
