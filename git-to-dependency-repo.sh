@@ -80,5 +80,5 @@ git checkout -q master
 rm -rf /repositories/diggitout/test-workspace/extracted
 
 CMD="$STARTING_FOLDER/extract-and-record-files.sh '$TARGET_FOLDER' '$PATHS_FILE' '$SOURCE_REPO'"
-git filter-branch -f --tree-filter "$CMD" -- --all
+git filter-branch --tree-filter "$CMD" -- --all
 
