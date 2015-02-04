@@ -117,7 +117,8 @@ function extractFile() {
 		echo "cp $targetFolder/$FILENAME_SANS_EXTENSION-$found.$EXTENSION $FILE" >> $restoreFile
 	fi
 	echo "      Deleting $FILE"
-	rm -f "$FILE" > /dev/null 2>&1
+	git rm -f --cached --ignore-unmatch "$FILE"
+	rm -f "$FILE"
 }
 
 echo "Reading list of files to extract..."
@@ -150,4 +151,9 @@ do
     fi
 done
 
-rm -f "$restoreFile"
+echo ""
+echo ""
+git add "$restoreFile"
+rm -f "$repoFolder/$restoreFile"
+git status
+#git ls-files
