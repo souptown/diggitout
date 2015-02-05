@@ -22,6 +22,6 @@ mkdir "$TEST_WORKSPACE/$EXTRACTED_FILES_FOLDER"
 unzip -q test-repo -d $TEST_WORKSPACE
 
 echo ""
-./git-to-dependency-repo.sh -r "$TEST_WORKSPACE/$SOURCE_REPO" -o m -d "$TEST_WORKSPACE/$EXTRACTED_FILES_FOLDER" -f "$FILES_TO_EXTRACT"
+./git-to-dependency-repo.sh -r "$TEST_WORKSPACE/$SOURCE_REPO" -o m -d "$TEST_WORKSPACE/$EXTRACTED_FILES_FOLDER" -t "$TEST_WORKSPACE/temp-repo" -f "$FILES_TO_EXTRACT"
 
 

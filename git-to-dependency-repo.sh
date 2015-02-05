@@ -25,6 +25,7 @@ function show_help() {
 	echo "    -r  Path to a local git repository"
 	echo "    -o  Type of output or dependency repository. Valid values are 'm' for Maven and 'n' for NuGet"
 	echo "    -d  Directory in which to place the versioned files"
+	echo "    -t  Directory in which to check out version of the real repo while processing."
 	echo "    -f  File containing paths of files to remove. 1 path per line."
 }
 
@@ -37,7 +38,7 @@ function realpath() {
 
 STARTING_FOLDER=`pwd`
 
-while getopts "h?vr:f:o:d:" opt; do
+while getopts "h?vr:f:o:d:t:" opt; do
     case "$opt" in
     h|\?)
         show_help
@@ -55,6 +56,9 @@ while getopts "h?vr:f:o:d:" opt; do
     d)
 		TARGET_FOLDER=$(realpath "$OPTARG")
 		;;
+    t)
+		TEMP_REPO=$(realpath "$OPTARG")
+		;;
     f)
 		PATHS_FILE=$(realpath "$OPTARG")
 		;;
@@ -68,6 +72,8 @@ echo "Repository:"
 echo "    "$(realpath "$SOURCE_REPO")
 echo "Target folder for extracted files:"
 echo "    "$TARGET_FOLDER
+echo "Temp folder for repo work:"
+echo "    "$TEMP_REPO
 echo "Files to extract:"
 for fff in $(cat "$PATHS_FILE")
 do
@@ -79,6 +85,8 @@ cd "$SOURCE_REPO"
 git checkout -q master
 rm -rf /repositories/diggitout/test-workspace/extracted
 
+#gitk
+
 CMD="$STARTING_FOLDER/extract-and-record-files.sh '$TARGET_FOLDER' '$PATHS_FILE' '$SOURCE_REPO'"
-git filter-branch --tree-filter "$CMD" HEAD
+git filter-branch --tree-filter "$CMD" -d "$TEMP_REPO"
 
